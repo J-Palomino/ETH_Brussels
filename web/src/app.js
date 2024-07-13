@@ -3,10 +3,6 @@ import lighthouse from '@lighthouse-web3/sdk';
 import QRCode from 'qrcode.react';
 import axios from 'axios';
 
-
-console.log('Lighthouse API Key:', process.env.REACT_APP_LIGHTHOUSE_KEY);
-console.log('Google Vision API Key:', process.env.REACT_APP_AI_KEY);
-
 const apiKey = process.env.REACT_APP_LIGHTHOUSE_KEY;  // Get your API key from Lighthouse
 const aiKey = process.env.REACT_APP_AI_KEY; 
 
