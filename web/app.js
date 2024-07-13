@@ -1,11 +1,12 @@
 import lighthouse from '@lighthouse-web3/sdk';
 
-const apiKey = 'YOUR_LIGHTHOUSE_API_KEY';  // Get your API key from Lighthouse
+const apiKey = '583da035.ed5f3661683246b2a64d1da5c8ed1fb5';  // Get your API key from Lighthouse
 
 async function uploadPhoto(file) {
     console.log('Starting the upload to Filecoin...');
     try {
         const response = await lighthouse.upload(file, apiKey);
+        console.log('Lighthouse response:', response);  // Log the entire response
         const cid = response.data.Hash;
         console.log(`Upload complete. Content added with CID: ${cid}`);
         return cid;
@@ -60,6 +61,7 @@ document.getElementById('connect').addEventListener('click', async () => {
                 document.getElementById('status').textContent = 'Status: Connected and Photo Captured';
 
                 // Convert base64 image to File object
+                console.log('Converting base64 to file object...');
                 const byteString = atob(base64Image.split(',')[1]);
                 const ab = new ArrayBuffer(byteString.length);
                 const ia = new Uint8Array(ab);
@@ -67,6 +69,7 @@ document.getElementById('connect').addEventListener('click', async () => {
                     ia[i] = byteString.charCodeAt(i);
                 }
                 const file = new Blob([ab], { type: 'image/jpeg' });
+                console.log('File object created:', file);
 
                 // Upload the photo to Filecoin
                 console.log('Starting the upload to Filecoin...');
