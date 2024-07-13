@@ -1,10 +1,15 @@
 import React, { useState } from 'react';
-const apiKey = '583da035.ed5f3661683246b2a64d1da5c8ed1fb5';  // Get your API key from Lighthouse
 import lighthouse from '@lighthouse-web3/sdk';
 import QRCode from 'qrcode.react';
 import axios from 'axios';
 
-const openAiApiKey = 'sk-proj-IxnNhiHaiqBIx9uNuqa1T3BlbkFJkiJUAkcF4CDOoce8Y25q';  // Get your API key from OpenAI
+
+console.log('Lighthouse API Key:', process.env.REACT_APP_LIGHTHOUSE_KEY);
+console.log('Google Vision API Key:', process.env.REACT_APP_AI_KEY);
+
+const apiKey = process.env.REACT_APP_LIGHTHOUSE_KEY;  // Get your API key from Lighthouse
+const aiKey = process.env.REACT_APP_AI_KEY; 
+
 
 async function uploadPhoto(file) {
     console.log('Starting the upload to Filecoin...');
@@ -41,7 +46,7 @@ async function uploadPhoto(file) {
 }
 
 async function getChatGptDescription(image) {
-    console.log('Requesting description from ChatGPT...');
+    console.log('Requesting description from Galadriel...');
     try {
         const response = await axios.post(
             'https://api.openai.com/v1/chat/completions',
@@ -59,7 +64,7 @@ async function getChatGptDescription(image) {
             {
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${openAiApiKey}`
+                    'Authorization': `Bearer ${aiKey}`
                 }
             }
         );
