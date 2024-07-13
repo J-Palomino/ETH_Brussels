@@ -1,17 +1,74 @@
 import React, { useState } from 'react';
-import lighthouse from '@lighthouse-web3/sdk';
 const apiKey = '583da035.ed5f3661683246b2a64d1da5c8ed1fb5';  // Get your API key from Lighthouse
+import lighthouse from '@lighthouse-web3/sdk';
+import QRCode from 'qrcode.react';
+import axios from 'axios';
+
+const openAiApiKey = 'sk-proj-IxnNhiHaiqBIx9uNuqa1T3BlbkFJkiJUAkcF4CDOoce8Y25q';  // Get your API key from OpenAI
 
 async function uploadPhoto(file) {
     console.log('Starting the upload to Filecoin...');
     try {
-        const response = await lighthouse.upload(file, apiKey);
-        console.log('Lighthouse response:', response);  // Log the entire response
-        const cid = response.data.Hash;
+        const formData = new FormData();
+        formData.append('file', file);
+
+        const response = await fetch('https://node.lighthouse.storage/api/v0/add?wrap-with-directory=false', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${apiKey}`
+            },
+            body: formData
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+
+        const result = await response.json();
+        console.log('Lighthouse response:', result);  // Log the entire response
+        const cid = result.Hash;
         console.log(`Upload complete. Content added with CID: ${cid}`);
         return cid;
     } catch (error) {
         console.error('Error uploading to Filecoin via Lighthouse:', error);
+        if (error.response) {
+            console.error('Response data:', error.response.data);
+            console.error('Response status:', error.response.status);
+            console.error('Response headers:', error.response.headers);
+        }
+        throw error;
+    }
+}
+
+async function getChatGptDescription(image) {
+    console.log('Requesting description from ChatGPT...');
+    try {
+        const response = await axios.post(
+            'https://api.openai.com/v1/chat/completions',
+            {
+                model: 'gpt-4o', // or another model you prefer
+                messages: [
+                    {"role": "system", "content": "You are a helpful assistant that returns brief descriptions of images."},
+                    {"role": "user", "content": [
+                        {"type": "text", "text": "Describe the image below:"},
+                        {"type": "image_url", "image_url": {"url": `data:image/png;base64,${image}}`}
+                        }
+                    ]}
+                ]
+            },
+            {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${openAiApiKey}`
+                }
+            }
+        );
+
+        const description = response.data.choices[0].message.content;
+        console.log('ChatGPT description:', description);
+        return description;
+    } catch (error) {
+        console.error('Error getting description from ChatGPT:', error);
         throw error;
     }
 }
@@ -19,6 +76,8 @@ async function uploadPhoto(file) {
 const App = () => {
     const [status, setStatus] = useState('Disconnected');
     const [photo, setPhoto] = useState('');
+    const [cid, setCid] = useState('');
+    const [description, setDescription] = useState('');
 
     const connect = async () => {
         let serviceUuid = '12345678-1234-1234-1234-123456789012';
@@ -64,21 +123,41 @@ const App = () => {
                     img.style.display = 'block';
                     setStatus('Connected and Photo Captured');
 
-                    // Convert base64 image to File object
-                    console.log('Converting base64 to file object...');
-                    const byteString = atob(base64Image.split(',')[1]);
-                    const ab = new ArrayBuffer(byteString.length);
-                    const ia = new Uint8Array(ab);
-                    for (let i = 0; i < byteString.length; i++) {
-                        ia[i] = byteString.charCodeAt(i);
-                    }
-                    const file = new Blob([ab], { type: 'image/jpeg' });
-                    console.log('File object created:', file);
+                    try {
+                        // Ensure the base64 string is valid
+                        let cleanedBase64Image = base64Image.replace(/[^A-Za-z0-9+/=]/g, '');
 
-                    // Upload the photo to Filecoin
-                    console.log('Starting the upload to Filecoin...');
-                    const cid = await uploadPhoto(new File([file], 'photo.jpg'));
-                    setStatus(`Photo uploaded to Filecoin with CID: ${cid}`);
+                        // Correct padding
+                        while (cleanedBase64Image.length % 4 !== 0) {
+                            cleanedBase64Image += '=';
+                        }
+
+                        // Convert base64 image to File object
+                        console.log('Converting base64 to file object...');
+                        const byteString = atob(cleanedBase64Image);
+                        const ab = new ArrayBuffer(byteString.length);
+                        const ia = new Uint8Array(ab);
+                        for (let i = 0; i < byteString.length; i++) {
+                            ia[i] = byteString.charCodeAt(i);
+                        }
+                        const file = new Blob([ab], { type: 'image/jpeg' });
+                        console.log('File object created:', file);
+
+                        // Upload the photo to Filecoin
+                        console.log('Starting the upload to Filecoin...');
+                        const cid = await uploadPhoto(new File([file], 'photo.jpg'));
+                        setCid(cid);
+                        setStatus(`Photo uploaded to Filecoin with CID: ${cid}`);
+
+                        const ipfsLink = `https://gateway.lighthouse.storage/ipfs/${cid}`;
+                        // RUN GALADRIEl inference here:
+                        const description = await getChatGptDescription(cleanedBase64Image);
+
+                        setDescription(description);
+                    } catch (e) {
+                        console.error('Error decoding base64 image:', e);
+                        setStatus('Error: Invalid base64 image string');
+                    }
                 }, 5000);  // Adjust the timeout as necessary based on the chunk transmission time
             });
 
@@ -98,6 +177,20 @@ const App = () => {
             <button id="take-photo" disabled>Take New Photo</button>
             <p>Status: {status}</p>
             <img id="photo" style={{ display: 'none' }} />
+            {cid && (
+                <div>
+                    <p>
+                        Photo uploaded to Filecoin with CID: <a href={`https://gateway.lighthouse.storage/ipfs/${cid}`} target="_blank" rel="noopener noreferrer">{cid}</a>
+                    </p>
+                    <QRCode value={`https://gateway.lighthouse.storage/ipfs/${cid}`} />
+                </div>
+            )}
+            {description && (
+                <div>
+                    <h2>Image Description</h2>
+                    <p>{description}</p>
+                </div>
+            )}
         </div>
     );
 };
