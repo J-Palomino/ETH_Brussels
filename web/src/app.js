@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import lighthouse from '@lighthouse-web3/sdk';
 import QRCode from 'qrcode.react';
 import axios from 'axios';
+import SpeechRecognition from './SpeechRec';
 
 const apiKey = process.env.REACT_APP_LIGHTHOUSE_KEY;  // Get your API key from Lighthouse
 const aiKey = process.env.REACT_APP_AI_KEY; 
@@ -196,12 +197,12 @@ const App = () => {
             )}
             {description && (
                 <div>
-                    <h2>Image Description</h2>
                     {description && (
                 <div>
                     <h2>Image Description</h2>
                     <p>{description}</p>
                     <button onClick={() => speak(description)}>Listen to Description</button>
+                    <SpeechRecognition/>
                 </div>
             )}
                 </div>
