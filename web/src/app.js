@@ -10,6 +10,14 @@ console.log('Google Vision API Key:', process.env.REACT_APP_AI_KEY);
 const apiKey = process.env.REACT_APP_LIGHTHOUSE_KEY;  // Get your API key from Lighthouse
 const aiKey = process.env.REACT_APP_AI_KEY; 
 
+const speak = (text) => {
+    if ('speechSynthesis' in window) {
+        const utterance = new SpeechSynthesisUtterance(text);
+        window.speechSynthesis.speak(utterance);
+    } else {
+        console.error('Text-to-speech is not supported in this browser.');
+    }
+};
 
 async function uploadPhoto(file) {
     console.log('Starting the upload to Filecoin...');
@@ -193,7 +201,13 @@ const App = () => {
             {description && (
                 <div>
                     <h2>Image Description</h2>
+                    {description && (
+                <div>
+                    <h2>Image Description</h2>
                     <p>{description}</p>
+                    <button onClick={() => speak(description)}>Listen to Description</button>
+                </div>
+            )}
                 </div>
             )}
         </div>
