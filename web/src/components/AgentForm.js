@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { ethers } from 'ethers';
+import contractAbi from '../contractABI.js'
 
 const RunAgentForm = () => {
   const [query, setQuery] = useState('');
@@ -27,10 +28,7 @@ const RunAgentForm = () => {
 
       const signer = provider.getSigner();
       const contractAddress = '0x37b8AcD33DF268D2F63f807D9E84ac53e6f78470'; // Replace with your contract address
-      const contractABI = [
-        // ABI for the runAgent function
-        "function runAgent(string query, uint8 max_iterations) public returns (uint)"
-      ];
+      const contractABI = contractAbi; // Replace with your contract ABI
 
       const contract = new ethers.Contract(contractAddress, contractABI, signer);
 
