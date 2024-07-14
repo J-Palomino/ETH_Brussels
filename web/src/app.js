@@ -2,12 +2,12 @@ import React, { useState } from 'react';
 import lighthouse from '@lighthouse-web3/sdk';
 import QRCode from 'qrcode.react';
 import axios from 'axios';
-import SpeechRecognition from './SpeechRec';
+import SpeechRecognition from './speechRec';
 import RunAgentForm from './components/agentForm';
 import AgentInteractionComponent from './components/AgentInteract';
 
 const apiKey = process.env.REACT_APP_LIGHTHOUSE_KEY;  // Get your API key from Lighthouse
-const aiKey = process.env.REACT_APP_AI_KEY; 
+const aiKey = process.env.REACT_APP_AI_KEY;
 
 const speak = (text) => {
     if ('speechSynthesis' in window) {
@@ -60,12 +60,15 @@ async function getChatGptDescription(image) {
             {
                 model: 'gpt-4o', // or another model you prefer
                 messages: [
-                    {"role": "system", "content": "You are a helpful assistant that returns brief descriptions of images."},
-                    {"role": "user", "content": [
-                        {"type": "text", "text": "Describe the image below:"},
-                        {"type": "image_url", "image_url": {"url": `data:image/png;base64,${image}}`}
-                        }
-                    ]}
+                    { "role": "system", "content": "You are a helpful assistant that returns brief descriptions of images." },
+                    {
+                        "role": "user", "content": [
+                            { "type": "text", "text": "Describe the image below:" },
+                            {
+                                "type": "image_url", "image_url": { "url": `data:image/png;base64,${image}}` }
+                            }
+                        ]
+                    }
                 ]
             },
             {
@@ -181,6 +184,7 @@ const App = () => {
             setStatus(`Error: ${error.message}`);
         }
     };
+   
 
     return (
         <div>
@@ -202,13 +206,13 @@ const App = () => {
             {description && (
                 <div>
                     {description && (
-                <div>
-                    <h2>Image Description</h2>
-                    <p>{description}</p>
-                    <button onClick={() => speak(description)}>Listen to Description</button>
-                    <SpeechRecognition/>
-                </div>
-            )}
+                        <div>
+                            <h2>Image Description</h2>
+                            <p>{description}</p>
+                            <button onClick={() => speak(description)}>Listen to Description</button>
+                            <SpeechRecognition />
+                        </div>
+                    )}
                 </div>
             )}
         </div>
