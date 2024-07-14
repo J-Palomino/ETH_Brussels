@@ -3,6 +3,7 @@ import lighthouse from '@lighthouse-web3/sdk';
 import QRCode from 'qrcode.react';
 import axios from 'axios';
 import SpeechRecognition from './SpeechRec';
+import RunAgentForm from './components/agentForm';
 
 const apiKey = process.env.REACT_APP_LIGHTHOUSE_KEY;  // Get your API key from Lighthouse
 const aiKey = process.env.REACT_APP_AI_KEY; 
@@ -183,6 +184,7 @@ const App = () => {
     return (
         <div>
             <h1>Nounocle Photo Capture</h1>
+            <RunAgentForm />
             <button onClick={connect}>Connect to Nounocle</button>
             <button id="take-photo" disabled>Take New Photo</button>
             <p>Status: {status}</p>
