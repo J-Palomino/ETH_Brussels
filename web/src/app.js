@@ -203,6 +203,7 @@ const App = () => {
                     <QRCode value={`https://gateway.lighthouse.storage/ipfs/${cid}`} />
                 </div>
             )}
+            <SpeechRecognition />
             {description && (
                 <div>
                     {description && (
@@ -210,7 +211,7 @@ const App = () => {
                             <h2>Image Description</h2>
                             <p>{description}</p>
                             <button onClick={() => speak(description)}>Listen to Description</button>
-                            <SpeechRecognition />
+                            
                         </div>
                     )}
                 </div>

@@ -199,7 +199,6 @@ contract Noungent {
         newMessage.content[0].value = content;
         return newMessage;
     }
-
     // @notice Compares two strings for equality
     // @param a The first string
     // @param b The second string

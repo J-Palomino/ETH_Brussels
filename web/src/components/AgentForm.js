@@ -53,12 +53,12 @@ const RunAgentForm = () => {
       <form onSubmit={handleSubmit}>
         <label>
           Query:
-          <input type="text" value={query} onChange={handleQueryChange} required />
+          <input type="text"  value={query} onChange={handleQueryChange} required />
         </label>
         <br />
         <label>
           Max Iterations:
-          <input type="number" value={maxIterations} onChange={handleMaxIterationsChange} required />
+          <input type="number"  value={maxIterations} onChange={handleMaxIterationsChange} required />
         </label>
         <br />
         <button type="submit">Run Agent</button>

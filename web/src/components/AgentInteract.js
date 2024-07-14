@@ -50,6 +50,7 @@ const AgentInteractionComponent = () => {
         <div>
             <input
                 type="text"
+                id="queryAgent"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder="Enter query"
@@ -57,10 +58,11 @@ const AgentInteractionComponent = () => {
             <input
                 type="number"
                 value={maxIterations}
+                id="maxIterations"
                 onChange={(e) => setMaxIterations(Number(e.target.value))}
                 placeholder="Max Iterations"
             />
-            <button onClick={runAgent}>Run Agent</button>
+            <button id='runAgent' onClick={runAgent}>Run Agent</button>
 
             {agentId && (
                 <>
