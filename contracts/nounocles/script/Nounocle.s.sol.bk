@@ -1,0 +1,24 @@
+// SPDX-License-Identifier: UNLICENSED
+pragma solidity ^0.8.9;
+
+import "forge-std/Script.sol";
+import "../src/Nounocle.sol";
+
+contract DeployNounocles is Script {
+    function run() external {
+        // Load the private key from the environment variable
+        uint256 deployerPrivateKey = vm.envUint("PRIVATE_KEY");
+
+        // Start broadcasting the transaction using the private key
+        vm.startBroadcast(deployerPrivateKey);
+
+        // Deploy the contract
+        Nounocle nounocle = new Nounocle(0x68EC9556830AD097D661Df2557FBCeC166a0A075);
+
+        // Stop broadcasting the transaction
+        vm.stopBroadcast();
+
+        // Optionally, log the deployed contract address
+        console.log("Nounocles deployed to:", address(nounocle));
+    }
+}
